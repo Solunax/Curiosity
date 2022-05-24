@@ -2,6 +2,7 @@ package com.project.curiosity
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import com.project.curiosity.databinding.AddDeviceBinding
 import com.project.curiosity.room.AppDataBase
@@ -28,6 +29,10 @@ class AddDeviceActivity:Activity() {
 
         val deviceName = binding.deviceName
         val addButton = binding.addDevice
+        val deleteButton = binding.deleteDevice
+
+        val data = intent.getStringArrayListExtra("deviceList")
+        Log.d("DATA", data.toString())
 
         addButton.setOnClickListener {
             if(deviceName.text.isNotBlank()){
@@ -37,12 +42,28 @@ class AddDeviceActivity:Activity() {
                     val device = Device(deviceName.text.toString())
                     deviceDB!!.DeviceDAO().insertDeviceData(device)
                 }
+                setResult(RESULT_OK)
                 finish()
             }else{
                 Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
                 deviceName.requestFocus()
             }
+        }
 
+        deleteButton.setOnClickListener {
+            if(deviceName.text.isNotBlank()){
+                val deviceDB = AppDataBase.getInstance(this)
+
+                job = CoroutineScope(Dispatchers.IO).launch {
+                    val device = Device(deviceName.text.toString())
+                    deviceDB!!.DeviceDAO().deleteDeviceData(device)
+                }
+                setResult(RESULT_OK)
+                finish()
+            }else{
+                Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
+                deviceName.requestFocus()
+            }
         }
     }
 }

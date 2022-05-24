@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -20,6 +22,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(){
     private lateinit var binding : MainActivityBinding
+    private lateinit var getResultActivity: ActivityResultLauncher<Intent>
     private lateinit var job:Job
     private val deviceNameList = LinkedList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp, R.drawable.gps)
@@ -36,15 +39,11 @@ class MainActivity : AppCompatActivity(){
         deviceSpinner = binding.deviceNameSpinner
 
         val deviceDB = AppDataBase.getInstance(this)
-        job = CoroutineScope(Dispatchers.IO).launch {
-            val deviceList = deviceDB!!.DeviceDAO().getDeviceData()
+        getDeviceID(deviceDB!!)
 
-            deviceList.forEach {
-                Log.d("DD", it.deviceID)
-                deviceNameList.add(it.deviceID)
-            }
-            val adapter = ArrayAdapter(applicationContext, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, deviceNameList)
-            deviceSpinner.adapter = adapter
+        getResultActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+            if(it.resultCode == RESULT_OK)
+                getDeviceID(deviceDB)
         }
 
         viewPager.adapter = StateAdapter(supportFragmentManager, lifecycle)
@@ -52,8 +51,10 @@ class MainActivity : AppCompatActivity(){
 
         addDeviceButton.setOnClickListener {
             val intent = Intent(applicationContext, AddDeviceActivity::class.java)
-            startActivity(intent)
+            intent.putExtra("deviceList", deviceNameList)
+            getResultActivity.launch(intent)
         }
+
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -76,5 +77,19 @@ class MainActivity : AppCompatActivity(){
 
     fun getSpinnerData():String{
         return deviceSpinner.selectedItem.toString()
+    }
+
+    private fun getDeviceID(db:AppDataBase){
+        deviceNameList.clear()
+        job = CoroutineScope(Dispatchers.IO).launch {
+            val deviceList = db.DeviceDAO().getDeviceData()
+
+            deviceList.forEach {
+                Log.d("DD", it.deviceID)
+                deviceNameList.add(it.deviceID)
+            }
+            val adapter = ArrayAdapter(applicationContext, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, deviceNameList)
+            runOnUiThread { deviceSpinner.adapter = adapter }
+        }
     }
 }
