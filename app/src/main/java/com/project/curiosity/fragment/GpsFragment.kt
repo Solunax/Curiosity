@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 
 class GpsFragment: Fragment() {
     private lateinit var binding: GpsFragmentBinding
@@ -36,7 +37,9 @@ class GpsFragment: Fragment() {
             val wantTime = time.text.toString()
             getData(id, wantTime)
         }
+
         return binding.root
+
     }
 
     private fun getData(nameValue: String, timeValue:String) {
