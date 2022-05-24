@@ -20,6 +20,7 @@ import com.project.curiosity.R
 import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.GraphFragmentBinding
 import com.project.curiosity.model.Request
+import com.project.curiosity.model.Request2
 import com.project.curiosity.yongapi.ApiClient1
 import kotlinx.coroutines.*
 
@@ -36,14 +37,16 @@ class GraphFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = GraphFragmentBinding.inflate(inflater, container, false)
+
         val temp = binding.textViewTemp
         val humi = binding.textViewHumi
         val imageButton_temp = binding.imageButtonTemp
         val imageButton_humi = binding.imageButtonHumi
+        val res = binding.result
         lineChart = binding.lineChart
 
         imageButton_temp.setOnClickListener{
-            getData1("curiosity", "")
+            getData1("curiosity", "2022-05-24")
         }
 
         imageButton_humi.setOnClickListener{
@@ -142,14 +145,18 @@ class GraphFragment : Fragment() {
 
     private fun getData1(nameValue:String, timeValue:String) {
         job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(nameValue, timeValue)
-            Log.d("BasycSyntax","namevalue: $nameValue 입니다")
+            val request = Request2(nameValue, timeValue)
             val response = ApiClient1.getApiClient1().getData1(request)
-            if(response.isSuccessful && response.body()!!.statusCode ==200)
-                requireActivity().runOnUiThread{ binding.textViewTemp.text = response.body().toString() }
+                Log.d("BasycSyntax", "getdata: $response 입니다")
+                if (response.isSuccessful && response.body()!!.statusCode == 200)
+                    requireActivity().runOnUiThread {
+                        binding.result.text = response.body().toString()
+                    }
+            }
         }
+
     }
 
 
-}
+
 
