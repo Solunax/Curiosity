@@ -6,5 +6,5 @@ data class Body2 (
     @SerializedName("deviceId") val deviceId : String,
     @SerializedName("timestamp") val timestamp : String,
     @SerializedName("temperature") val temperature : Int,
-    @SerializedName("humidity") val humidity : Int,
+    @SerializedName("humidity") val humidity : Int
 )

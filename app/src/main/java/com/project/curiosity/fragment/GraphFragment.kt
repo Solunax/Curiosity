@@ -1,11 +1,13 @@
 package com.project.curiosity.fragment
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.animation.Easing
@@ -23,33 +25,48 @@ import com.project.curiosity.model.Request
 import com.project.curiosity.model.Request2
 import com.project.curiosity.yongapi.ApiClient1
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 
 private var sensorList = ArrayList<sensor>()
+private val sdf = SimpleDateFormat("yyyy:MM:dd HH:MM:ss")
 
 class GraphFragment : Fragment() {
-    private lateinit var binding : GraphFragmentBinding
+    private lateinit var binding: GraphFragmentBinding
     private lateinit var lineChart: LineChart
     private var job: Job? = null
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = GraphFragmentBinding.inflate(inflater, container, false)
-
         val temp = binding.textViewTemp
         val humi = binding.textViewHumi
         val imageButton_temp = binding.imageButtonTemp
         val imageButton_humi = binding.imageButtonHumi
         val res = binding.result
+        val refresh = binding.refresh
+
         lineChart = binding.lineChart
 
-        imageButton_temp.setOnClickListener{
-            getData1("curiosity", "2022-05-24")
+        refresh.setOnClickListener{
+            var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) //"yyyy:MM:dd HH:mm:ss"
+            getData1("curiosity", a)
         }
 
-        imageButton_humi.setOnClickListener{
+        imageButton_temp.setOnClickListener {
+            temp.setText("25")
+        }
+
+        imageButton_humi.setOnClickListener {
             humi.setText("30")
         }
 
@@ -59,6 +76,9 @@ class GraphFragment : Fragment() {
         return binding.root
     }
 
+    private fun main(args: Array<String>){
+        val date = Date()
+    }
 
 
     private fun initLineChart() {
@@ -143,19 +163,18 @@ class GraphFragment : Fragment() {
         return sensorList
     }
 
-    private fun getData1(nameValue:String, timeValue:String) {
-        job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request2(nameValue, timeValue)
-            val response = ApiClient1.getApiClient1().getData1(request)
-                Log.d("BasycSyntax", "getdata: $response 입니다")
+
+    private fun getData1(nameValue: String, timeValue: String) {
+            job = CoroutineScope(Dispatchers.IO).launch {
+                val request = Request2(nameValue, timeValue)
+                val response = ApiClient1.getApiClient1().getData1(request)
                 if (response.isSuccessful && response.body()!!.statusCode == 200)
                     requireActivity().runOnUiThread {
                         binding.result.text = response.body().toString()
                     }
-            }
         }
-
     }
+}
 
 
 
