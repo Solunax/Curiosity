@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.activity.result.ActivityResultLauncher
@@ -18,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 
 class MainActivity : AppCompatActivity(){
@@ -56,19 +59,19 @@ class MainActivity : AppCompatActivity(){
         }
 
 
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-
-            }
-        })
+//        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+//            override fun onTabSelected(tab: TabLayout.Tab?) {
+//
+//            }
+//
+//            override fun onTabUnselected(tab: TabLayout.Tab?) {
+//
+//            }
+//
+//            override fun onTabReselected(tab: TabLayout.Tab?) {
+//
+//            }
+//        })
 
         TabLayoutMediator(tabLayout, viewPager){tab, position ->
             tab.icon = AppCompatResources.getDrawable(applicationContext, tabIcon[position])
@@ -76,7 +79,12 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun getSpinnerData():String{
-        return deviceSpinner.selectedItem.toString()
+        return try{
+            deviceSpinner.selectedItem.toString()
+        }catch (e:Exception){
+            "ERROR"
+        }
+
     }
 
     private fun getDeviceID(db:AppDataBase){
