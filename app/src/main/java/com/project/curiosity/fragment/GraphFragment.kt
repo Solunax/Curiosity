@@ -33,7 +33,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 private var sensorList = ArrayList<sensor>()
-private val sdf = SimpleDateFormat("yyyy:MM:dd HH:MM:ss")
+private var globalstring :String = ""
+private var globaltemp :String = ""
+private var globalhumi :String = ""
 
 class GraphFragment : Fragment() {
     private lateinit var binding: GraphFragmentBinding
@@ -58,16 +60,17 @@ class GraphFragment : Fragment() {
         lineChart = binding.lineChart
 
         refresh.setOnClickListener{
-            var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) //"yyyy:MM:dd HH:mm:ss"
+            var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //"yyyy-MM-dd HH:mm:ss"
             getData1("curiosity", a)
         }
 
         imageButton_temp.setOnClickListener {
             temp.setText("25")
+            change_string()
         }
 
         imageButton_humi.setOnClickListener {
-            humi.setText("30")
+            humi.setText(globalstring)
         }
 
         initLineChart()
@@ -125,6 +128,12 @@ class GraphFragment : Fragment() {
         }
     }
 
+    private fun change_string() {
+        globalstring = "hello"
+        print(globalstring)
+        Log.d("globalstring2:","${globalstring}")
+    }
+
 
     private fun setDataToLineChart() {
         //now draw bar chart with dynamic data
@@ -156,9 +165,9 @@ class GraphFragment : Fragment() {
     private fun getsensorList(): ArrayList<sensor> {
         sensorList.add(sensor("05:00", 30))
         sensorList.add(sensor("06:00", 20))
-        sensorList.add(sensor("07:00", 24))
-        sensorList.add(sensor("08:00", 36))
-        sensorList.add(sensor("09:00", 25))
+//        sensorList.add(sensor("07:00", 24))
+//        sensorList.add(sensor("08:00", 36))
+//        sensorList.add(sensor("09:00", 25))
 
         return sensorList
     }
@@ -170,7 +179,17 @@ class GraphFragment : Fragment() {
                 val response = ApiClient1.getApiClient1().getData1(request)
                 if (response.isSuccessful && response.body()!!.statusCode == 200)
                     requireActivity().runOnUiThread {
-                        binding.result.text = response.body().toString()
+//                        binding.result.text = response.body().toString()
+                        globalstring = response.body().toString()
+                        val number = globalstring.replace("[^0-9]".toRegex(), "")
+                        Log.d("number","${globalstring}")
+                        val number1 = number.substring(number.length-4, number.length)
+                        Log.d("number1","${number1}")
+                        globaltemp = number1.substring(0 until 2)
+                        globalhumi = number1.substring(2 until 4)
+                        //202205253332
+                        binding.textViewTemp.setText(globaltemp)
+                        binding.textViewHumi.setText(globalhumi)
                     }
         }
     }
