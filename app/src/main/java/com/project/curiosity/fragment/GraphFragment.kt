@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IntegerRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -24,6 +25,7 @@ import com.project.curiosity.databinding.GraphFragmentBinding
 import com.project.curiosity.model.Request
 import com.project.curiosity.model.Request2
 import com.project.curiosity.yongapi.ApiClient1
+import io.reactivex.Completable.timer
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -31,11 +33,17 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.timer
 
 private var sensorList = ArrayList<sensor>()
 private var globalstring :String = ""
 private var globaltemp :String = ""
 private var globalhumi :String = ""
+@RequiresApi(Build.VERSION_CODES.O)
+private var local_time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH"))
+
+
+private var globaltime :String = ""
 
 class GraphFragment : Fragment() {
     private lateinit var binding: GraphFragmentBinding
@@ -54,19 +62,19 @@ class GraphFragment : Fragment() {
         val humi = binding.textViewHumi
         val imageButton_temp = binding.imageButtonTemp
         val imageButton_humi = binding.imageButtonHumi
-        val res = binding.result
-        val refresh = binding.refresh
 
         lineChart = binding.lineChart
 
-        refresh.setOnClickListener{
-            var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //"yyyy-MM-dd HH:mm:ss"
-            getData1("curiosity", a)
+        val timer = timer(period = 10000){
+            getData1("curiosity", "")
         }
 
+        //var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //"yyyy-MM-dd HH:mm:ss"
+
         imageButton_temp.setOnClickListener {
-            temp.setText("25")
-            change_string()
+            getsensorList()
+            sensorList.add(sensor("04", 20))
+
         }
 
         imageButton_humi.setOnClickListener {
@@ -135,6 +143,7 @@ class GraphFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setDataToLineChart() {
         //now draw bar chart with dynamic data
         val entries: ArrayList<Entry> = ArrayList()
@@ -162,35 +171,34 @@ class GraphFragment : Fragment() {
 
     // simulate api call
     // we are initialising it directly
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList(): ArrayList<sensor> {
-        sensorList.add(sensor("05:00", 30))
-        sensorList.add(sensor("06:00", 20))
-//        sensorList.add(sensor("07:00", 24))
-//        sensorList.add(sensor("08:00", 36))
-//        sensorList.add(sensor("09:00", 25))
+        sensorList.add(sensor("02", 30))
+        sensorList.add(sensor("03", 40))
+        sensorList.add(sensor("04", 20))
 
         return sensorList
     }
 
-
     private fun getData1(nameValue: String, timeValue: String) {
-            job = CoroutineScope(Dispatchers.IO).launch {
-                val request = Request2(nameValue, timeValue)
-                val response = ApiClient1.getApiClient1().getData1(request)
-                if (response.isSuccessful && response.body()!!.statusCode == 200)
-                    requireActivity().runOnUiThread {
-//                        binding.result.text = response.body().toString()
-                        globalstring = response.body().toString()
-                        val number = globalstring.replace("[^0-9]".toRegex(), "")
-                        Log.d("number","${globalstring}")
-                        val number1 = number.substring(number.length-4, number.length)
-                        Log.d("number1","${number1}")
-                        globaltemp = number1.substring(0 until 2)
-                        globalhumi = number1.substring(2 until 4)
-                        //202205253332
-                        binding.textViewTemp.setText(globaltemp)
-                        binding.textViewHumi.setText(globalhumi)
-                    }
+        job = CoroutineScope(Dispatchers.IO).launch {
+            val request = Request2(nameValue, timeValue)
+            val response = ApiClient1.getApiClient1().getData1(request)
+            if (response.isSuccessful && response.body()!!.statusCode == 200)
+                globalstring = response.body().toString()
+            val number = globalstring.replace("[^0-9]".toRegex(), "")
+            Log.d("number","${globalstring}")
+            val number1 = number.substring(number.length-4, number.length)
+            var time1 = number.substring(number.length-8, number.length)
+            Log.d("number1","${number1}")
+            globaltemp = number1.substring(0 until 2)
+            globalhumi = number1.substring(2 until 4)
+            globaltime = time1.substring(0 until 2)
+            Log.d("globaltime","${globaltime}")
+            requireActivity().runOnUiThread {
+                binding.textViewTemp.setText(globaltemp)
+                binding.textViewHumi.setText(globalhumi)
+                }
         }
     }
 }

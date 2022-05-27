@@ -10,7 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient1 {
-    private val BASE_URL:String = "https://hwghawcyc9.execute-api.ap-northeast-2.amazonaws.com/default/"
+    private val BASE_URL:String ="https://k9ew99trga.execute-api.ap-northeast-2.amazonaws.com/default/"
 
     private fun getRetrofit(): Retrofit {
         val gson: Gson = GsonBuilder().setLenient().create()
