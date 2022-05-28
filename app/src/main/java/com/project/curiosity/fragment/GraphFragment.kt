@@ -30,6 +30,7 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.timer
 
 private var sensorList = ArrayList<sensor>()
+private var sensorList1 = ArrayList<sensor1>()
 private var globalstring :String = ""
 private var globaltemp :String = ""
 private var globalhumi :String = ""
@@ -72,17 +73,15 @@ class GraphFragment : Fragment() {
         }
 
         imageButton_humi.setOnClickListener {
-            humi.setText(globalstring)
+            setDataToLineChart_renew_humi()
+            lineChart.invalidate();
         }
 
         initLineChart()
         setDataToLineChart()
+        setDataToLineChart_humi()
 
         return binding.root
-    }
-
-    private fun main(args: Array<String>) {
-        val date = Date()
     }
 
 
@@ -119,7 +118,53 @@ class GraphFragment : Fragment() {
 
     }
 
+    private fun initLineChart_humi() {
 
+        lineChart.axisLeft.setDrawGridLines(false)
+        val xAxis: XAxis = lineChart.xAxis
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(false)
+
+        //remove right y-axis
+        lineChart.axisRight.isEnabled = false
+
+        //remove legend
+        lineChart.legend.isEnabled = false
+
+
+        //remove description label
+        lineChart.description.isEnabled = false
+
+
+        //add animation
+        lineChart.animateX(1000, Easing.EaseInSine)
+
+        lineChart.setDragXEnabled(true);
+
+        // to draw label on xAxis
+        xAxis.setDrawAxisLine(true)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.valueFormatter = MyAxisFormatter1()
+        xAxis.setDrawLabels(true)
+        xAxis.granularity = 1f
+        xAxis.axisLineColor
+
+    }
+
+    //humi
+    inner class MyAxisFormatter1 : IndexAxisValueFormatter() {
+
+        override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+            val index = value.toInt()
+            return if (index < sensorList1.size) {
+                sensorList1[index].name
+            } else {
+                ""
+            }
+        }
+    }
+
+    //temp
     inner class MyAxisFormatter : IndexAxisValueFormatter() {
 
         override fun getAxisLabel(value: Float, axis: AxisBase?): String {
@@ -131,14 +176,7 @@ class GraphFragment : Fragment() {
             }
         }
     }
-
-    private fun change_string() {
-        globalstring = "hello"
-        print(globalstring)
-        Log.d("globalstring2:", "${globalstring}")
-    }
-
-
+    //temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setDataToLineChart() {
         //now draw bar chart with dynamic data
@@ -164,7 +202,34 @@ class GraphFragment : Fragment() {
 
         lineChart.invalidate()
     }
+    //humi
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setDataToLineChart_humi() {
+        //now draw bar chart with dynamic data
+        val entries1: ArrayList<Entry> = ArrayList()
 
+        sensorList1 = getsensorList1()
+
+        //you can replace this data object with  your custom object
+        for (i in sensorList1.indices) {
+            val sensor1 = sensorList1[i]
+            entries1.add(Entry(i.toFloat(), sensor1.humi.toFloat()))
+        }
+
+        val lineDataSet = LineDataSet(entries1, "")
+
+        val data = LineData(lineDataSet)
+        lineChart.data = data
+
+        lineDataSet.setDrawFilled(true)
+        lineDataSet.fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gradient)
+        lineDataSet.setColor(Color.parseColor("#6441A5"))
+        lineDataSet.setCircleColor(Color.DKGRAY);
+
+        lineChart.invalidate()
+    }
+
+    //temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setDataToLineChart_renew() {
         //now draw bar chart with dynamic data
@@ -190,24 +255,50 @@ class GraphFragment : Fragment() {
     }
 
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun getsensorList(): ArrayList<sensor> {
-//        sensorList.add(sensor("00",0 ))
-//        sensorList.add(sensor(globaltime, Integer.parseInt(globaltemp)))
-//
-//
-//        return sensorList
-//    }
+    //humi
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setDataToLineChart_renew_humi() {
+        //now draw bar chart with dynamic data
+        val entries: ArrayList<Entry> = ArrayList()
 
+        //you can replace this data object with  your custom object
+        for (i in sensorList1.indices) {
+            val sensor1 = sensorList1[i]
+            entries.add(Entry(i.toFloat(), sensor1.humi.toFloat()))
+        }
+
+        val lineDataSet = LineDataSet(entries, "")
+
+        val data = LineData(lineDataSet)
+        lineChart.data = data
+
+        lineDataSet.setDrawFilled(true)
+        lineDataSet.fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gradient1)
+        lineDataSet.setColor(Color.parseColor("#6441A5"))
+        lineDataSet.setCircleColor(Color.DKGRAY);
+
+        lineChart.invalidate()
+    }
+
+    // temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList(): ArrayList<sensor> {
         sensorList.add(sensor("00", 0))
         sensorList.add(sensor(local_time, 20))
 
-
-
         return sensorList
     }
+
+    // humi
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getsensorList1(): ArrayList<sensor1> {
+        sensorList1.add(sensor1("00", 0))
+        sensorList1.add(sensor1(local_time, 40))
+
+        return sensorList1
+    }
+
+
 
 
     private fun getData1(nameValue: String, timeValue: String) {
@@ -222,23 +313,27 @@ class GraphFragment : Fragment() {
             globaltemp = number1.substring(0 until 2)
             globalhumi = number1.substring(2 until 4)
             globaltime = time1.substring(0 until 2)
-            Log.d("globaltime", "${globaltime}")
             requireActivity().runOnUiThread {
                 binding.textViewTemp.setText(globaltemp)
                 binding.textViewHumi.setText(globalhumi)
                 var compare_name = sensorList.get(globalcount).name
                 var compare_temp = sensorList.get(globalcount).temp
+                var compare_humi = sensorList1.get(globalcount).humi
                 Log.d("비교", "${globaltime},${compare_name}")
                 if (globaltime == compare_name) {
                     if (compare_temp < Integer.parseInt(globaltemp)) {
-                        sensorList.set(globalcount, sensor(globaltime, Integer.parseInt(globaltemp))
-                        )
+                        sensorList.set(globalcount, sensor(globaltime, Integer.parseInt(globaltemp)))
+                        if(compare_humi < Integer.parseInt(globalhumi)){
+                            sensorList1.set(globalcount, sensor1(globaltime, Integer.parseInt(globalhumi)))
+                        }
                     }
                 }
                 else {
                     globalcount += 1
                     sensorList.add(sensor(globaltime, Integer.parseInt(globaltemp)))
+                    sensorList1.add(sensor1(globaltime, Integer.parseInt(globalhumi)))
                     }
+
                 Log.d("list", "${sensorList},${globalcount}")
 
             }
