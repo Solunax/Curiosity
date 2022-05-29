@@ -14,6 +14,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.project.curiosity.databinding.MainActivityBinding
+import com.project.curiosity.fragment.GpsFragment
 import com.project.curiosity.fragmentAdapter.StateAdapter
 import com.project.curiosity.room.AppDataBase
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity(){
     private val deviceNameList = LinkedList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
+    private var fragmentIndex = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +50,8 @@ class MainActivity : AppCompatActivity(){
             if(it.resultCode == RESULT_OK)
                 getDeviceID(deviceDB)
         }
-
-        viewPager.adapter = StateAdapter(supportFragmentManager, lifecycle)
+        val manager = supportFragmentManager
+        viewPager.adapter = StateAdapter(manager, lifecycle)
         viewPager.currentItem = 1
 
         addDeviceButton.setOnClickListener {
@@ -58,24 +60,30 @@ class MainActivity : AppCompatActivity(){
             getResultActivity.launch(intent)
         }
 
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                fragmentIndex = tab!!.position
+            }
 
-//        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-//            override fun onTabSelected(tab: TabLayout.Tab?) {
-//
-//            }
-//
-//            override fun onTabUnselected(tab: TabLayout.Tab?) {
-//
-//            }
-//
-//            override fun onTabReselected(tab: TabLayout.Tab?) {
-//
-//            }
-//        })
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
 
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
         TabLayoutMediator(tabLayout, viewPager){tab, position ->
             tab.icon = AppCompatResources.getDrawable(applicationContext, tabIcon[position])
         }.attach()
+
+        deviceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                val fragment: GpsFragment? = supportFragmentManager.findFragmentByTag("f2") as GpsFragment?
+                fragment?.drawRoute(true)
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+        }
     }
 
     fun getSpinnerData():String{
@@ -87,17 +95,20 @@ class MainActivity : AppCompatActivity(){
 
     }
 
+    fun getFragmentLocation():Int{
+        return fragmentIndex
+    }
+
     private fun getDeviceID(db:AppDataBase){
         deviceNameList.clear()
         job = CoroutineScope(Dispatchers.IO).launch {
             val deviceList = db.DeviceDAO().getDeviceData()
-
             deviceList.forEach {
-                Log.d("DD", it.deviceID)
                 deviceNameList.add(it.deviceID)
             }
-            val adapter = ArrayAdapter(applicationContext, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, deviceNameList)
+            val adapter = ArrayAdapter(applicationContext, R.layout.spinner_item, deviceNameList)
             runOnUiThread { deviceSpinner.adapter = adapter }
         }
     }
+
 }
