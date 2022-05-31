@@ -1,5 +1,4 @@
 package com.project.curiosity.fragment
-
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -32,14 +31,14 @@ import kotlin.concurrent.timer
 private var sensorList = ArrayList<sensor>()
 private var sensorList1 = ArrayList<sensor1>()
 private var globalstring :String = ""
-private var globaltemp :String = ""
-private var globalhumi :String = ""
+private var globaltime :String = ""
+private var globaltemp :Int = 0
+private var globalhumi :Int = 0
 var globalcount = 1
+var global_state = 1
 @RequiresApi(Build.VERSION_CODES.O)
 private var local_time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH"))
 
-
-private var globaltime :String = ""
 
 class GraphFragment : Fragment() {
     private lateinit var binding: GraphFragmentBinding
@@ -65,16 +64,18 @@ class GraphFragment : Fragment() {
             getData1("curiosity", "")
         }
 
+
         //var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //"yyyy-MM-dd HH:mm:ss"
 
         imageButton_temp.setOnClickListener {
+            global_state = 1
             setDataToLineChart_renew()
-            lineChart.invalidate();
+
         }
 
         imageButton_humi.setOnClickListener {
+            global_state = 2
             setDataToLineChart_renew_humi()
-            lineChart.invalidate();
         }
 
         initLineChart()
@@ -284,7 +285,7 @@ class GraphFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList(): ArrayList<sensor> {
         sensorList.add(sensor("00", 0))
-        sensorList.add(sensor(local_time, 20))
+        sensorList.add(sensor(globaltime, globaltemp))
 
         return sensorList
     }
@@ -293,48 +294,45 @@ class GraphFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList1(): ArrayList<sensor1> {
         sensorList1.add(sensor1("00", 0))
-        sensorList1.add(sensor1(local_time, 40))
+        sensorList1.add(sensor1(globaltime, globalhumi))
 
         return sensorList1
     }
-
-
 
 
     private fun getData1(nameValue: String, timeValue: String) {
         job = CoroutineScope(Dispatchers.IO).launch {
             val request = Request2(nameValue, timeValue)
             val response = ApiClient1.getApiClient1().getData1(request)
-            if (response.isSuccessful && response.body()!!.statusCode == 200)
-                globalstring = response.body().toString()
-            val number = globalstring.replace("[^0-9]".toRegex(), "")
-            val number1 = number.substring(number.length - 4, number.length)
-            var time1 = number.substring(number.length - 8, number.length)
-            globaltemp = number1.substring(0 until 2)
-            globalhumi = number1.substring(2 until 4)
+            if (response.isSuccessful && response.body()!!.statusCode == 200) {
+                globaltime = response.body()!!.body[0].timestamp
+                globaltemp = response.body()!!.body[0].temperature
+                globalhumi = response.body()!!.body[0].humidity
+            }
+            var time1 = globaltime.substring(globaltime.length -5, globaltime.length)
             globaltime = time1.substring(0 until 2)
-            requireActivity().runOnUiThread {
-                binding.textViewTemp.setText(globaltemp)
-                binding.textViewHumi.setText(globalhumi)
-                var compare_name = sensorList.get(globalcount).name
-                var compare_temp = sensorList.get(globalcount).temp
-                var compare_humi = sensorList1.get(globalcount).humi
-                Log.d("비교", "${globaltime},${compare_name}")
-                if (globaltime == compare_name) {
-                    if (compare_temp < Integer.parseInt(globaltemp)) {
-                        sensorList.set(globalcount, sensor(globaltime, Integer.parseInt(globaltemp)))
-                        if(compare_humi < Integer.parseInt(globalhumi)){
-                            sensorList1.set(globalcount, sensor1(globaltime, Integer.parseInt(globalhumi)))
-                        }
-                    }
+            var compare_name = sensorList.get(globalcount).name
+            var compare_temp = sensorList.get(globalcount).temp
+            var compare_humi = sensorList1.get(globalcount).humi
+            if (globaltime == compare_name) {
+                if (compare_temp < globaltemp) {
+                    sensorList.set(globalcount, sensor(globaltime, globaltemp))}
+                if(compare_humi < globalhumi){
+                    sensorList1.set(globalcount, sensor1(globaltime, globalhumi))
                 }
-                else {
-                    globalcount += 1
-                    sensorList.add(sensor(globaltime, Integer.parseInt(globaltemp)))
-                    sensorList1.add(sensor1(globaltime, Integer.parseInt(globalhumi)))
-                    }
-
-                Log.d("list", "${sensorList},${globalcount}")
+            }
+            else {
+                globalcount += 1
+                sensorList.add(sensor(globaltime, globaltemp))
+                sensorList1.add(sensor1(globaltime, globalhumi))
+            }
+            requireActivity().runOnUiThread {
+                binding.textViewTemp.setText(globaltemp.toString())
+                binding.textViewHumi.setText(globalhumi.toString())
+                if (global_state == 1)
+                    setDataToLineChart_renew()
+                else
+                    setDataToLineChart_renew_humi()
 
             }
         }
