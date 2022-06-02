@@ -1,6 +1,6 @@
 package com.project.curiosity.fragment
 
-import MediaScanner
+import com.project.curiosity.MediaScanner
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -16,7 +16,6 @@ import com.project.curiosity.databinding.CameraFragmentBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
 
 class CameraFragment : Fragment() {
     private lateinit var binding : CameraFragmentBinding

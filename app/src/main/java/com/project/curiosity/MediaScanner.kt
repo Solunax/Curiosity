@@ -1,3 +1,5 @@
+package com.project.curiosity
+
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.media.MediaScannerConnection.MediaScannerConnectionClient

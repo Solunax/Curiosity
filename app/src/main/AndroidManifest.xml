@@ -26,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".RoverListActivity"/>
         <activity android:name=".AddDeviceActivity"/>
     </application>
 
