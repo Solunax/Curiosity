@@ -29,37 +29,26 @@ class AddDeviceActivity:Activity() {
 
         val deviceName = binding.deviceName
         val addButton = binding.addDevice
-        val deleteButton = binding.deleteDevice
 
-        val data = intent.getStringArrayListExtra("deviceList")
-        Log.d("DATA", data.toString())
+        val deviceNameList = intent.getStringArrayListExtra("deviceList")
+        Log.d("DATA", deviceNameList.toString())
 
         addButton.setOnClickListener {
             if(deviceName.text.isNotBlank()){
-                val deviceDB = AppDataBase.getInstance(this)
+                if(!deviceNameList!!.contains(deviceName.text.toString())){
+                    val deviceDB = AppDataBase.getInstance(this)
 
-                job = CoroutineScope(Dispatchers.IO).launch {
-                    val device = Device(deviceName.text.toString())
-                    deviceDB!!.DeviceDAO().insertDeviceData(device)
+                    job = CoroutineScope(Dispatchers.IO).launch {
+                        val device = Device(deviceName.text.toString())
+                        deviceDB!!.DeviceDAO().insertDeviceData(device)
+                    }
+                    setResult(RESULT_OK)
+                    finish()
+                }else{
+                    Toast.makeText(applicationContext, "이미 등록된 이름입니다.", Toast.LENGTH_SHORT).show()
+                    deviceName.requestFocus()
                 }
-                setResult(RESULT_OK)
-                finish()
-            }else{
-                Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
-                deviceName.requestFocus()
-            }
-        }
 
-        deleteButton.setOnClickListener {
-            if(deviceName.text.isNotBlank()){
-                val deviceDB = AppDataBase.getInstance(this)
-
-                job = CoroutineScope(Dispatchers.IO).launch {
-                    val device = Device(deviceName.text.toString())
-                    deviceDB!!.DeviceDAO().deleteDeviceData(device)
-                }
-                setResult(RESULT_OK)
-                finish()
             }else{
                 Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
                 deviceName.requestFocus()

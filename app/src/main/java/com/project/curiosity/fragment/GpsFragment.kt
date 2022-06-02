@@ -59,7 +59,8 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
         timer = Timer()
         timer.schedule(object:TimerTask(){
             override fun run() {
-                drawRoute(false)
+                if((activity as MainActivity).getFragmentLocation() == 2)
+                    drawRoute(false)
             }
         }, 0, 10000)
 
@@ -88,15 +89,15 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
             marker.position(location)
             requireActivity().runOnUiThread{
                 map.addMarker(marker)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 20f))
             }
         }else if(locationArray.size > 1 && locationArray[locationArray.size - 1] != locationArray[locationArray.size - 2]){
             val marker = MarkerOptions()
             marker.position(location)
             requireActivity().runOnUiThread{
                 map.addMarker(marker)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
-                map.addPolyline(PolylineOptions().add(locationArray[locationArray.size - 2], locationArray[locationArray.size - 1]).width(5f))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 20f))
+                map.addPolyline(PolylineOptions().add(locationArray[locationArray.size - 2], locationArray[locationArray.size - 1]).width(10f))
             }
         }
     }

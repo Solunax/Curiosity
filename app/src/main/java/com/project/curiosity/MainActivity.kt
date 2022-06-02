@@ -3,7 +3,6 @@ package com.project.curiosity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -22,13 +21,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.lang.Exception
-import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(){
     private lateinit var binding : MainActivityBinding
     private lateinit var getResultActivity: ActivityResultLauncher<Intent>
     private lateinit var job:Job
-    private val deviceNameList = LinkedList<String>()
+    private val deviceNameList = ArrayList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
     private var fragmentIndex = 1
@@ -50,12 +49,13 @@ class MainActivity : AppCompatActivity(){
             if(it.resultCode == RESULT_OK)
                 getDeviceID(deviceDB)
         }
+
         val manager = supportFragmentManager
         viewPager.adapter = StateAdapter(manager, lifecycle)
         viewPager.currentItem = 1
 
         addDeviceButton.setOnClickListener {
-            val intent = Intent(applicationContext, AddDeviceActivity::class.java)
+            val intent = Intent(applicationContext, RoverListActivity::class.java)
             intent.putExtra("deviceList", deviceNameList)
             getResultActivity.launch(intent)
         }
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity(){
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+
         TabLayoutMediator(tabLayout, viewPager){tab, position ->
             tab.icon = AppCompatResources.getDrawable(applicationContext, tabIcon[position])
         }.attach()
@@ -92,7 +93,6 @@ class MainActivity : AppCompatActivity(){
         }catch (e:Exception){
             "ERROR"
         }
-
     }
 
     fun getFragmentLocation():Int{
@@ -110,5 +110,4 @@ class MainActivity : AppCompatActivity(){
             runOnUiThread { deviceSpinner.adapter = adapter }
         }
     }
-
 }
