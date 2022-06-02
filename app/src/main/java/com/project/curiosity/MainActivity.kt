@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(){
         viewPager.currentItem = 1
 
         addDeviceButton.setOnClickListener {
-            val intent = Intent(applicationContext, RoverList::class.java)
+            val intent = Intent(applicationContext, RoverListActivity::class.java)
             intent.putExtra("deviceList", deviceNameList)
             getResultActivity.launch(intent)
         }
