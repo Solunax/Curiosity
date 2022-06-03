@@ -284,7 +284,7 @@ class GraphFragment : Fragment() {
     // temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList(): ArrayList<sensor> {
-        sensorList.add(sensor("00", 0))
+        sensorList.add(sensor("", 0))
         sensorList.add(sensor(globaltime, globaltemp))
 
         return sensorList
@@ -293,7 +293,7 @@ class GraphFragment : Fragment() {
     // humi
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getsensorList1(): ArrayList<sensor1> {
-        sensorList1.add(sensor1("00", 0))
+        sensorList1.add(sensor1("", 0))
         sensorList1.add(sensor1(globaltime, globalhumi))
 
         return sensorList1
