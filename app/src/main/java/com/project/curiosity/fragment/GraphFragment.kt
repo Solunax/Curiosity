@@ -42,9 +42,10 @@ private var globalString :String = ""
 private var globalTime :String = ""
 private var globalTemperature :Int = 0
 private var globalHumidity :Int = 0
-var globalCount = 1
+var globalCount = 0
 var globalState = 1
 var calendarState = 1
+var state = 0
 var dateString = ""
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -434,7 +435,7 @@ class GraphFragment : Fragment() {
         lineChart3.invalidate()
     }
 
-    //temp
+    // temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setDataToLineChartRenew() {
         //now draw bar chart with dynamic data
@@ -572,6 +573,10 @@ class GraphFragment : Fragment() {
             val request = Request(nameValue, timeValue)
             val response = ApiClient.getApiClient().getData(request)
             if (response.isSuccessful && response.body()!!.statusCode == 200) {
+                if(state == 0) {
+                    sensorList.removeAt(1)
+                    sensorList1.removeAt(1)
+                }
                 globalTime = response.body()!!.body[0].timestamp
                 globalTemperature = response.body()!!.body[0].temperature
                 globalHumidity = response.body()!!.body[0].humidity
@@ -592,6 +597,7 @@ class GraphFragment : Fragment() {
                 }
                 else {
                     globalCount += 1
+                    state += 1
                     sensorList.add(sensor(globalTime, globalTemperature))
                     sensorList1.add(sensor1(globalTime, globalHumidity))
                 }
