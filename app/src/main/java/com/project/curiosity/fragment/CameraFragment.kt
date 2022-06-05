@@ -31,7 +31,7 @@ class CameraFragment : Fragment() {
         val web = binding.webView
         web.settings.javaScriptEnabled = true
         web.webViewClient = WebViewClient()
-        web.loadUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+        web.loadUrl("https://www.youtube.com/watch?v=Mq8E_1LkoAc")
 
         binding.c.setOnClickListener{
             pixelCopy(web.rootView){bitmap ->
