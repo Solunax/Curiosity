@@ -1,9 +1,7 @@
 package com.project.curiosity.room
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.IGNORE
-import androidx.room.Query
 
 @Dao
 interface DeviceDAO {
@@ -12,4 +10,7 @@ interface DeviceDAO {
 
     @Query("SELECT * FROM device")
     suspend fun getDeviceData():List<Device>
+
+    @Delete
+    suspend fun deleteDeviceData(device: Device)
 }
