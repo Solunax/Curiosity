@@ -20,6 +20,11 @@ import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.GpsFragmentBinding
 import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -65,6 +70,7 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
         }, 0, 10000)
 
         return binding.root
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
