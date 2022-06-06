@@ -16,23 +16,15 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.project.curiosity.MainActivity
-import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.GpsFragmentBinding
 import com.project.curiosity.model.Body
-import com.project.curiosity.model.Request
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
-import kotlinx.coroutines.*
 import java.util.*
 
 class GpsFragment: Fragment(), OnMapReadyCallback {
     private lateinit var binding: GpsFragmentBinding
     private var job: Job? = null
     private lateinit var roverMap:MapView
-    private lateinit var timer:Timer
     private lateinit var map: GoogleMap
     private lateinit var changeMap: FloatingActionButton
     private val locationArray = LinkedList<LatLng>()
@@ -41,14 +33,14 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GpsFragmentBinding.inflate(inflater, container, false)
 
         roverMap = binding.mapView
         changeMap = binding.mapChange
 
         changeMap.setOnClickListener {
-//            위성지도, 일반지도 변경
+            // 위성지도, 일반지도 변경
             if(map.mapType == 1){
                 map.mapType = GoogleMap.MAP_TYPE_HYBRID
                 roverMap.invalidate()
@@ -60,34 +52,39 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
 
         roverMap.onCreate(savedInstanceState)
         roverMap.getMapAsync(this)
-//        1분 단위로 서버로부터 데이터를 받아옴
-        timer = Timer()
-        timer.schedule(object:TimerTask(){
-            override fun run() {
-                if((activity as MainActivity).getFragmentLocation() == 2)
-                    drawRoute(false)
-            }
-        }, 0, 10000)
 
         return binding.root
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
     }
 
-    private fun getData(nameValue: String, timeValue:String) {
-        job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(nameValue, timeValue)
-            val response = ApiClient.getApiClient().getData(request)
-            if(response.isSuccessful && response.body()!!.statusCode == 200)
-                addMarker(response.body()!!.body[0])
+    fun drawRoute(changeFlag:Boolean, data:Body) {
+        val id = (activity as MainActivity).getSpinnerData()
+        // 장치 ID 변경 확인
+        if((activity as MainActivity).changeGpsFlag){
+            requireActivity().runOnUiThread { map.clear() }
+            locationArray.clear()
+            addMarker(data)
+            (activity as MainActivity).changeGpsFlag = false
+            return
+        }
+
+        if(!changeFlag){
+            if(id == "ERROR")
+                requireActivity().runOnUiThread { Toast.makeText(context, "장치 이름을 불러올 수 없습니다.", Toast.LENGTH_SHORT).show() }
+            else
+                addMarker(data)
+        }else{
+            requireActivity().runOnUiThread { map.clear() }
+            locationArray.clear()
+            addMarker(data)
         }
     }
 
-    private fun addMarker(dataArray: Body){
-        val location = LatLng(dataArray.latitude, dataArray.longitude)
+    private fun addMarker(data: Body){
+        val location = LatLng(data.latitude, data.longitude)
         locationArray.add(location)
 
         if(locationArray.size == 1){
@@ -95,33 +92,16 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
             marker.position(location)
             requireActivity().runOnUiThread{
                 map.addMarker(marker)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 20f))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
             }
         }else if(locationArray.size > 1 && locationArray[locationArray.size - 1] != locationArray[locationArray.size - 2]){
             val marker = MarkerOptions()
             marker.position(location)
             requireActivity().runOnUiThread{
                 map.addMarker(marker)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 20f))
-                map.addPolyline(PolylineOptions().add(locationArray[locationArray.size - 2], locationArray[locationArray.size - 1]).width(10f))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                map.addPolyline(PolylineOptions().add(locationArray[locationArray.size - 2], locationArray[locationArray.size - 1]).width(15f))
             }
-        }
-    }
-
-    fun drawRoute(changeFlag:Boolean) {
-        Log.d("DD", "YYYY")
-        val id = (activity as MainActivity).getSpinnerData()
-        if(!changeFlag){
-            if((activity as MainActivity).getFragmentLocation() == 2){
-                if(id == "ERROR")
-                    requireActivity().runOnUiThread { Toast.makeText(context, "장치 이름을 불러올 수 없습니다.", Toast.LENGTH_SHORT).show() }
-                else
-                    getData(id, "")
-            }
-        }else{
-            requireActivity().runOnUiThread { map.clear() }
-            locationArray.clear()
-            getData(id, "")
         }
     }
 

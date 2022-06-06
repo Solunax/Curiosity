@@ -19,9 +19,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="serif"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
                 android:text="Curiosity"
-                android:textColor="@color/black"
+                android:textColor="#2980B9"
                 android:textSize="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
