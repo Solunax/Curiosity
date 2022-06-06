@@ -41,9 +41,10 @@ private var globalString :String = ""
 private var globalTime :String = ""
 private var globalTemperature :Int = 0
 private var globalHumidity :Int = 0
-var globalCount = 1
+var globalCount = 0
 var globalState = 1
 var calendarState = 1
+var state = 0
 var dateString = ""
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -426,7 +427,7 @@ class GraphFragment : Fragment() {
         lineChart3.invalidate()
     }
 
-    //temp
+    // temp
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setDataToLineChartRenew() {
         //now draw bar chart with dynamic data
