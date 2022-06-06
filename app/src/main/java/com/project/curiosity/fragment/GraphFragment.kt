@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +23,7 @@ import com.project.curiosity.MainActivity
 import com.project.curiosity.R
 import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.GraphFragmentBinding
+import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
 import com.project.curiosity.model.Request2
 import com.project.curiosity.yongapi.ApiClient1
@@ -32,7 +32,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.timer
 
 private var sensorList = ArrayList<sensor>()
 private var sensorList1 = ArrayList<sensor1>()
@@ -57,7 +56,7 @@ class GraphFragment : Fragment() {
     private lateinit var lineChart3: LineChart
     private var job: Job? = null
     private val calendar = Calendar.getInstance()
-
+    private lateinit var dateSetListener : DatePickerDialog.OnDateSetListener
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -66,8 +65,6 @@ class GraphFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = GraphFragmentBinding.inflate(inflater, container, false)
-        val temperature = binding.textViewTemp
-        val humidity = binding.textViewHumi
         val temperatureText = binding.temp
         val humidityText = binding.humitext1
         val imageButtonTemperature = binding.imageButtonTemp
@@ -79,16 +76,40 @@ class GraphFragment : Fragment() {
         lineChart2 = binding.lineChart2
         lineChart3 = binding.lineChart3
 
-        val timer = timer(period = 10000) {
-            getData1((activity as MainActivity).getSpinnerData(), "")
-        }
+//        timer(initialDelay = 1000, period = 10000) {
+//            setGraph((activity as MainActivity).recentBody!!)
+//        }
 
-        //var a = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //"yyyy-MM-dd HH:mm:ss"
+//        val timer = Timer()
+//        timer.schedule(object:TimerTask(){
+//            override fun run() {
+//                setGraph((activity as MainActivity).recentBody!!)
+//            }
+//        }, 2000, 10000)
+
+        dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+            dateString = if(month + 1 <= 9){
+                if(dayOfMonth < 10)
+                    "${year}-${"0" + (month+1)}-${"0$dayOfMonth"}"
+                else
+                    "${year}-${"0" + (month+1)}-${dayOfMonth}"
+            }
+            else{
+                if(dayOfMonth < 10)
+                    "${year}-${month+1}-${"0$dayOfMonth"}"
+                else
+                    "${year}-${month+1}-${dayOfMonth}"
+            }
+            getSpecificData((activity as MainActivity).getSpinnerData(), dateString)
+            if(calendarState == 1)
+                temperatureText.text = dateString
+            else if(calendarState == 2)
+                humidityText.text = dateString
+        }
 
         imageButtonTemperature.setOnClickListener {
             globalState = 1
             setDataToLineChartRenew()
-
         }
 
         imageButtonHumidity.setOnClickListener {
@@ -97,48 +118,11 @@ class GraphFragment : Fragment() {
         }
 
         imageButtonTemperatureSearch.setOnClickListener {
-            calendarState = 1
-            val cal = Calendar.getInstance()    //캘린더뷰 만들기
-            val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                dateString = if(month + 1 <= 9){
-                    if(dayOfMonth < 10)
-                        "${year}-${"0" + (month+1)}-${"0$dayOfMonth"}"
-                    else
-                        "${year}-${"0" + (month+1)}-${dayOfMonth}"
-                }
-                else{
-                    if(dayOfMonth < 10)
-                        "${year}-${month+1}-${"0$dayOfMonth"}"
-                    else
-                        "${year}-${month+1}-${dayOfMonth}"
-                }
-                getData1((activity as MainActivity).getSpinnerData(), dateString)
-                temperatureText.text = dateString
-            }
-            DatePickerDialog(requireActivity(), dateSetListener, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH)).show()
+            getDate(it)
         }
 
         imageButtonHumiditySearch.setOnClickListener {
-            calendarState = 2
-            val cal = Calendar.getInstance()    //캘린더뷰 만들기
-            val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                dateString = if(month + 1 <= 9){
-                    if(dayOfMonth < 10)
-                        "${year}-${"0" + (month+1)}-${"0$dayOfMonth"}"
-                    else
-                        "${year}-${"0" + (month+1)}-${dayOfMonth}"
-                }
-                else{
-                    if(dayOfMonth < 10)
-                        "${year}-${month+1}-${"0$dayOfMonth"}"
-                    else
-                        "${year}-${month+1}-${dayOfMonth}"
-                }
-
-                getData1((activity as MainActivity).getSpinnerData(), dateString)
-                humidityText.text = dateString
-            }
-            DatePickerDialog(requireActivity(), dateSetListener, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH)).show()
+            getDate(it)
         }
 
         initLineChart()
@@ -152,9 +136,17 @@ class GraphFragment : Fragment() {
         return binding.root
     }
 
+    private fun getDate(view:View){
+        if(view.id.toString() == binding.imageButton7.id.toString())
+            calendarState = 1
+        else if((view.id.toString() == binding.imageButton6.id.toString()))
+            calendarState = 2
+
+        DatePickerDialog(requireActivity(), dateSetListener, calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
 
     private fun initLineChart() {
-
         lineChart.axisLeft.setDrawGridLines(false)
         val xAxis: XAxis = lineChart.xAxis
         xAxis.setDrawGridLines(false)
@@ -567,36 +559,11 @@ class GraphFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getData1(nameValue: String, timeValue: String) {
+    private fun getSpecificData(deviceId:String, time:String){
         job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(nameValue, timeValue)
+            val request = Request(deviceId, time)
             val response = ApiClient.getApiClient().getData(request)
-            if (response.isSuccessful && response.body()!!.statusCode == 200) {
-                globalTime = response.body()!!.body[0].timestamp
-                globalTemperature = response.body()!!.body[0].temperature
-                globalHumidity = response.body()!!.body[0].humidity
-
-                val time1 = globalTime.substring(globalTime.length -8, globalTime.length)
-                Log.d("TE", time1)
-                globalTime = time1.substring(0 until 2)
-                val compareName = sensorList[globalCount].name
-                val compareTemperature = sensorList[globalCount].temp
-                val compareHumidity = sensorList1[globalCount].humi
-                if (globalTime == compareName) {
-                    if (compareTemperature < globalTemperature) {
-                        sensorList[globalCount] = sensor(globalTime, globalTemperature)
-                    }
-                    if(compareHumidity < globalHumidity){
-                        sensorList1[globalCount] = sensor1(globalTime, globalHumidity)
-                    }
-                }
-                else {
-                    globalCount += 1
-                    sensorList.add(sensor(globalTime, globalTemperature))
-                    sensorList1.add(sensor1(globalTime, globalHumidity))
-                }
-            }
-            else if (response.isSuccessful && response.body()!!.statusCode == 201) {
+            if (response.isSuccessful && response.body()!!.statusCode == 201) {
                 var i = 0
                 val count = response.body()!!.length
                 sensorList2.clear()
@@ -617,19 +584,43 @@ class GraphFragment : Fragment() {
                     setDataToLineChartRenewTemperature()
                 else
                     setDataToLineChartRenewHumidity1()
+            }else{
+                requireActivity().runOnUiThread { Toast.makeText(requireActivity(), "선택한 날짜의 저장된 정보가 없습니다.", Toast.LENGTH_SHORT).show() }
             }
-            else if (response.isSuccessful && response.body()!!.statusCode == 204) {
-                requireActivity().runOnUiThread { Toast.makeText(requireActivity(), "myText", Toast.LENGTH_SHORT).show() }
-            }
+        }
+    }
 
-            requireActivity().runOnUiThread {
-                binding.textViewTemp.text = globalTemperature.toString()
-                binding.textViewHumi.text = globalHumidity.toString()
-                if (globalState == 1)
-                    setDataToLineChartRenew()
-                else
-                    setDataToLineChartRenewHumidity()
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun setGraph(data:Body) {
+        globalTime = data.timestamp
+        globalTemperature = data.temperature
+        globalHumidity = data.humidity
+
+        val time1 = globalTime.substring(globalTime.length -8, globalTime.length)
+        globalTime = time1.substring(0 until 2)
+        val compareName = sensorList[globalCount].name
+        val compareTemperature = sensorList[globalCount].temp
+        val compareHumidity = sensorList1[globalCount].humi
+        if (globalTime == compareName) {
+            if (compareTemperature < globalTemperature) {
+                sensorList[globalCount] = sensor(globalTime, globalTemperature)
             }
+            if(compareHumidity < globalHumidity){
+                sensorList1[globalCount] = sensor1(globalTime, globalHumidity)
+            }
+        }
+        else {
+            globalCount += 1
+            sensorList.add(sensor(globalTime, globalTemperature))
+            sensorList1.add(sensor1(globalTime, globalHumidity))
+        }
+        requireActivity().runOnUiThread {
+            binding.textViewTemp.text = globalTemperature.toString()
+            binding.textViewHumi.text = globalHumidity.toString()
+            if (globalState == 1)
+                setDataToLineChartRenew()
+            else
+                setDataToLineChartRenewHumidity()
         }
     }
 }
