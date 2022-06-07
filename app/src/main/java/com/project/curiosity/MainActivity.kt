@@ -116,9 +116,9 @@ class MainActivity : AppCompatActivity(){
         timer.schedule(object: TimerTask(){
             @RequiresApi(Build.VERSION_CODES.O)
             override fun run() {
-                getData1()
+                getData()
             }
-        }, 1000, 5000)
+        }, 100, 5000)
     }
 
     // 상단 장치 ID 스피너 값 가져오기
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity(){
 
     // 서버에서 최신값 하나만 정보 가져오기
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getData1() {
+    private fun getData() {
         job = CoroutineScope(Dispatchers.IO).launch {
             val request = Request2(getSpinnerData(), "")
             val response = ApiClient1.getApiClient1().getData1(request)
@@ -165,8 +165,8 @@ class MainActivity : AppCompatActivity(){
     // 장치 변경시 GPS 갱신
     private fun changeDevice(fragment:GpsFragment) {
         job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(getSpinnerData(), "")
-            val response = ApiClient.getApiClient().getData(request)
+            val request = Request2(getSpinnerData(), "")
+            val response = ApiClient1.getApiClient1().getData1(request)
             if(response.isSuccessful && response.body()!!.statusCode == 200){
                 recentBody = response.body()!!.body[0]
                 fragment.drawRoute(true, recentBody!!)
@@ -178,11 +178,11 @@ class MainActivity : AppCompatActivity(){
     @RequiresApi(Build.VERSION_CODES.O)
     private fun changeDevice(fragment:GraphFragment) {
         job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(getSpinnerData(), "")
-            val response = ApiClient.getApiClient().getData(request)
+            val request = Request2(getSpinnerData(), "")
+            val response = ApiClient1.getApiClient1().getData1(request)
             if(response.isSuccessful && response.body()!!.statusCode == 200){
                 recentBody = response.body()!!.body[0]
-                fragment.setGraph(recentBody!!)
+                fragment.setGraph2(recentBody!!)
             }
         }
     }
