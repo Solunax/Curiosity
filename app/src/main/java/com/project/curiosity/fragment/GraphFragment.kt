@@ -593,6 +593,10 @@ class GraphFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun setGraph(data:Body) {
+        if(state == 0) {
+            sensorList.removeAt(1)
+            sensorList1.removeAt(1)
+        }
         globalTime = data.timestamp
         globalTemperature = data.temperature
         globalHumidity = data.humidity
@@ -612,6 +616,7 @@ class GraphFragment : Fragment() {
         }
         else {
             globalCount += 1
+            state += 1
             sensorList.add(sensor(globalTime, globalTemperature))
             sensorList1.add(sensor1(globalTime, globalHumidity))
         }

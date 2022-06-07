@@ -21,7 +21,9 @@ import com.project.curiosity.fragment.GraphFragment
 import com.project.curiosity.fragmentAdapter.StateAdapter
 import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
+import com.project.curiosity.model.Request2
 import com.project.curiosity.room.AppDataBase
+import com.project.curiosity.yongapi.ApiClient1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -114,9 +116,9 @@ class MainActivity : AppCompatActivity(){
         timer.schedule(object: TimerTask(){
             @RequiresApi(Build.VERSION_CODES.O)
             override fun run() {
-                getData()
+                getData1()
             }
-        }, 100, 5000)
+        }, 1000, 5000)
     }
 
     // 상단 장치 ID 스피너 값 가져오기
@@ -143,10 +145,10 @@ class MainActivity : AppCompatActivity(){
 
     // 서버에서 최신값 하나만 정보 가져오기
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getData() {
+    private fun getData1() {
         job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(getSpinnerData(), "")
-            val response = ApiClient.getApiClient().getData(request)
+            val request = Request2(getSpinnerData(), "")
+            val response = ApiClient1.getApiClient1().getData1(request)
             if(response.isSuccessful && response.body()!!.statusCode == 200){
                 recentBody = response.body()!!.body[0]
                 if(fragmentIndex == 1){
