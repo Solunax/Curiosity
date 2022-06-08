@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity(){
             val response = ApiClient.getApiClient().getData(request)
             if(response.isSuccessful && response.body()!!.statusCode == 200){
                 recentBody = response.body()!!.body[0]
-                fragment.setGraph(recentBody!!)
+                fragment.setGraph2(recentBody!!)
             }
         }
     }
