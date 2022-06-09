@@ -72,9 +72,9 @@ class CameraFragment : Fragment() {
 
     private fun changeIcon(state:Boolean, view:ImageButton){
         if(state)
-            view.setImageResource(R.drawable.ic_baseline_flash_off_24)
-        else
             view.setImageResource(R.drawable.ic_baseline_flash_on_24)
+        else
+            view.setImageResource(R.drawable.ic_baseline_flash_off_24)
     }
 
     @SuppressLint("SimpleDateFormat")
