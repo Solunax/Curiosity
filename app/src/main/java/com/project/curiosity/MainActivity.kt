@@ -8,8 +8,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.tabs.TabLayout
@@ -21,7 +20,7 @@ import com.project.curiosity.fragment.GraphFragment
 import com.project.curiosity.fragmentAdapter.StateAdapter
 import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
-import com.project.curiosity.room.AppDataBase
+import com.project.curiosity.viewModel.RoomViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,13 +31,13 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(){
     private lateinit var binding : MainActivityBinding
-    private lateinit var getResultActivity: ActivityResultLauncher<Intent>
     private lateinit var job:Job
     private val deviceNameList = ArrayList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
     private var recentBody:Body? = null
     private var fragmentIndex = 1
+    private val roomViewModel : RoomViewModel by viewModels()
     var changeGpsFlag = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,15 +50,6 @@ class MainActivity : AppCompatActivity(){
         val addDeviceButton = binding.addDevice
         deviceSpinner = binding.deviceNameSpinner
 
-        // 내부 DB Instance 생성
-        val deviceDB = AppDataBase.getInstance(this)
-        getDeviceID(deviceDB!!)
-
-        getResultActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            if(it.resultCode == RESULT_OK)
-                getDeviceID(deviceDB)
-        }
-
         val manager = supportFragmentManager
         viewPager.adapter = StateAdapter(manager, lifecycle)
         viewPager.currentItem = 1
@@ -67,7 +57,7 @@ class MainActivity : AppCompatActivity(){
         addDeviceButton.setOnClickListener {
             val intent = Intent(applicationContext, RoverListActivity::class.java)
             intent.putExtra("deviceList", deviceNameList)
-            getResultActivity.launch(intent)
+            startActivity(intent)
         }
 
         TabLayoutMediator(tabLayout, viewPager){tab, position ->
@@ -86,6 +76,16 @@ class MainActivity : AppCompatActivity(){
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+
+        // 내부 DB의 device DATA 관측
+        roomViewModel.data.observe(this) {
+            deviceNameList.clear()
+            it.forEach { v ->
+                deviceNameList.add(v.deviceID)
+            }
+            val adapter = ArrayAdapter(applicationContext, R.layout.spinner_item, deviceNameList)
+            deviceSpinner.adapter = adapter
+        }
 
         // 장치 ID 변경시 GPS 위치 갱신
         deviceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -125,19 +125,6 @@ class MainActivity : AppCompatActivity(){
             deviceSpinner.selectedItem.toString()
         }catch (e:Exception){
             "ERROR"
-        }
-    }
-
-    // 내부 DB의 장치 ID 가져오기
-    private fun getDeviceID(db:AppDataBase){
-        deviceNameList.clear()
-        job = CoroutineScope(Dispatchers.IO).launch {
-            val deviceList = db.DeviceDAO().getDeviceData()
-            deviceList.forEach {
-                deviceNameList.add(it.deviceID)
-            }
-            val adapter = ArrayAdapter(applicationContext, R.layout.spinner_item, deviceNameList)
-            runOnUiThread { deviceSpinner.adapter = adapter }
         }
     }
 
