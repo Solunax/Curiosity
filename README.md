@@ -4,9 +4,15 @@
 ## 탐사로버 Curiosity 제작 및 모니터링 앱 제작(IoT 프로젝트)
 - 3학년 팀 프로젝트 및 졸업작품으로 진행한 팀 프로젝트
 - 로버의 하드웨어와 로버의 정보를 수신받아 모니터링하는 앱을 제작
+  - 로버는 Node MCU(아두이노), Arduino MEGA를 활용하여 제작함
 - 본인은 이번 프로젝트에서 다음의 일을 수행하였음
+  - AWS DynamoDB, API Gateway, Lambda 등 DB에 필요한 구성 설정 및 테스트
+  - 로버 <-> AWS DynamoDB 간 통신 설정 및 테스트
+  - Activity, Fragment 기반 생성
   - retrofit2를 API 및 인터페이스 및 데이터클래스 생성과 AWS와 HTTP 통신(DB)
   - 내부 DB를 사용하는데 필요한 DB 클래스, DAO, view model 및 model등을 생성함
+  - 로버의 GPS 기반 위치표시 기능 전체, 로버의 캡처기능 일부를 구현
+  - 내부 DB에 로버의 이름 정보를 추가, 삭제, 확인하는 기능 구현
   
 <br>
 
