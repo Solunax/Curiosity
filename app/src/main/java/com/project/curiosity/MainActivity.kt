@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity(){
             override fun onTabReselected(tab: TabLayout.Tab?) {
 
             }
-
         })
 
         // 상단의 리스너 설정 이후에 설정해야 의도대로 동작함
@@ -110,7 +109,6 @@ class MainActivity : AppCompatActivity(){
 
         // 장치 ID 변경시 GPS 위치 갱신
         deviceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            @RequiresApi(Build.VERSION_CODES.O)
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 getData()
             }
@@ -122,7 +120,6 @@ class MainActivity : AppCompatActivity(){
         // ?초 주기로 서버에서 데이터를 가져옴
         val timer = Timer()
         timer.schedule(object: TimerTask(){
-            @RequiresApi(Build.VERSION_CODES.O)
             override fun run() {
                 getData()
             }
@@ -142,7 +139,7 @@ class MainActivity : AppCompatActivity(){
     private fun getData(){
         val nameData = getSpinnerData()
         if(nameData != "ERROR")
-            viewModel.getData(Request(nameData, ""))
+            viewModel.getData(Request(nameData, ""), "latest")
     }
 
     // TabLayout 아이콘 색상 변경 함수
@@ -152,9 +149,9 @@ class MainActivity : AppCompatActivity(){
         when(flag){
             true -> {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    icon?.colorFilter = BlendModeColorFilter(ContextCompat.getColor(applicationContext, R.color.myyellow), BlendMode.SRC_IN)
+                    icon?.colorFilter = BlendModeColorFilter(ContextCompat.getColor(applicationContext, R.color.main_yellow), BlendMode.SRC_IN)
                 else
-                    icon?.setColorFilter(R.color.myyellow, PorterDuff.Mode.SRC_IN)
+                    icon?.setColorFilter(R.color.main_yellow, PorterDuff.Mode.SRC_IN)
             }
             false ->{
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -166,7 +163,6 @@ class MainActivity : AppCompatActivity(){
     }
 
 //    기존 통신 코드
-//    @RequiresApi(Build.VERSION_CODES.O)
 //    private fun getData() {
 //        job = CoroutineScope(Dispatchers.IO).launch {
 //            val request = Request(getSpinnerData(), "")

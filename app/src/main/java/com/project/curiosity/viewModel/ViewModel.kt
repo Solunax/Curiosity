@@ -15,8 +15,10 @@ import kotlinx.coroutines.launch
 
 class ViewModel(application : Application) : AndroidViewModel(application) {
     val nameData : LiveData<List<Device>>
+    val specificData get() = _specificData
     val roverData get() = _roverData
     private val _roverData = MutableLiveData<Body>()
+    private val _specificData = MutableLiveData<Body>()
     private val repository : Repository
 
     init{
@@ -39,13 +41,17 @@ class ViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     // 서버에서 데이터를 가져오는 메소드
-    fun getData(body : Request) {
+    fun getData(body : Request, type : String) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.getData(body)
             if(response.isSuccessful && response.body()!!.statusCode == 200){
-                val recentData = response.body()!!.body[0]
-                _roverData.postValue(recentData)
+                val data = response.body()!!.body[0]
+                if(type == "latest")
+                    _roverData.postValue(data)
+                else if(type == "specific")
+                    _specificData.postValue(data)
             }
         }
     }
+
 }

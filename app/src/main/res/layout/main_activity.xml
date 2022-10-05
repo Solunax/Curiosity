@@ -10,7 +10,7 @@
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white">
+        android:background="@drawable/gradient">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
                 android:text="Curiosity"
-                android:textColor="#380C81"
+                android:textColor="@color/main_purple"
                 android:textSize="32sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:tabSelectedTextColor="@color/purple_700"
-        app:tabIndicatorColor="#380C81"
+        app:tabIndicatorColor="@color/main_purple"
+        app:tabIndicatorHeight="5dp"
         app:tabTextColor="@color/black"/>
 
     <androidx.viewpager2.widget.ViewPager2
