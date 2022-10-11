@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(){
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp2, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
     private var recentBody:Body? = null
-    val viewModel : ViewModel by viewModels()
+    private val viewModel : ViewModel by viewModels()
 
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
