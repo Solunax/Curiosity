@@ -28,25 +28,25 @@
         <ImageButton
             android:id="@+id/imageButton_temp"
             android:layout_width="85dp"
-            android:layout_height="131dp"
-            android:layout_marginTop="76dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="60dp"
             android:background="@color/white"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.199"
+            app:layout_constraintHorizontal_bias="0.213"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/temp_f" />
 
         <ImageButton
             android:id="@+id/imageButton_humi"
-            android:layout_width="71dp"
-            android:layout_height="121dp"
-            android:layout_marginTop="76dp"
+            android:layout_width="67dp"
+            android:layout_height="116dp"
+            android:layout_marginTop="80dp"
             android:background="@color/white"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.776"
+            app:layout_constraintHorizontal_bias="0.791"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/humidity_f" />
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:text=""
-            android:textColor="@color/myyellow"
+            android:textColor="@color/myorange"
             android:textSize="60dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/imageButton_temp"
@@ -69,13 +69,13 @@
             android:id="@+id/textView_humi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="32dp"
             android:text=""
             android:textColor="@color/myblue"
             android:textSize="60dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/imageButton_humi"
-            app:layout_constraintHorizontal_bias="0.492"
+            app:layout_constraintHorizontal_bias="0.494"
             app:layout_constraintStart_toStartOf="@+id/imageButton_humi"
             app:layout_constraintTop_toBottomOf="@+id/imageButton_humi" />
 
@@ -83,7 +83,7 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="26dp"
             android:text="Humidity"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -150,7 +150,7 @@
             app:layout_constraintTop_toBottomOf="@+id/lineChart2" />
 
         <ImageButton
-            android:id="@+id/imageButton6"
+            android:id="@+id/Humidity_Button"
             android:layout_width="41dp"
             android:layout_height="46dp"
             android:layout_marginTop="78dp"
@@ -206,7 +206,7 @@
             app:layout_constraintTop_toBottomOf="@+id/lineChart" />
 
         <ImageButton
-            android:id="@+id/imageButton7"
+            android:id="@+id/Temperature_Button"
             android:layout_width="41dp"
             android:layout_height="46dp"
             android:layout_marginTop="96dp"
@@ -238,7 +238,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="224dp"
             android:text="ºc"
-            android:textColor="@color/main_yellow"
+            android:textColor="@color/myorange"
             android:textSize="30dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -250,13 +250,14 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="224dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="228dp"
             android:text="%"
             android:textColor="@color/myblue"
             android:textSize="30dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.858"
+            app:layout_constraintHorizontal_bias="0.871"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.*
+import com.project.curiosity.Event
 import com.project.curiosity.api.ApiClient
 import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
@@ -15,10 +16,12 @@ import kotlinx.coroutines.launch
 
 class ViewModel(application : Application) : AndroidViewModel(application) {
     val nameData : LiveData<List<Device>>
-    val specificData get() = _specificData
-    val roverData get() = _roverData
     private val _roverData = MutableLiveData<Body>()
-    private val _specificData = MutableLiveData<Body>()
+    val roverData get() = _roverData
+    private val _specificData = MutableLiveData<MutableList<Body>>()
+    val specificData get() = _specificData
+    private val _specificErrorData = MutableLiveData<Event<Boolean>>()
+    val specificErrorData get() = _specificErrorData
     private val repository : Repository
 
     init{
@@ -44,12 +47,19 @@ class ViewModel(application : Application) : AndroidViewModel(application) {
     fun getData(body : Request, type : String) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.getData(body)
-            if(response.isSuccessful && response.body()!!.statusCode == 200){
+            if (response.isSuccessful && response.body()!!.statusCode == 200) {
                 val data = response.body()!!.body[0]
-                if(type == "latest")
+                if (type == "latest")
                     _roverData.postValue(data)
-                else if(type == "specific")
-                    _specificData.postValue(data)
+            } else if (response.isSuccessful && response.body()!!.statusCode == 201) {
+                if (type == "specific") {
+                    val dataSpecific = response.body()!!.body
+                    _specificData.postValue(dataSpecific)
+                }
+            } else {
+                if (type == "specific") {
+                    _specificErrorData.postValue(Event(true))
+                }
             }
         }
     }

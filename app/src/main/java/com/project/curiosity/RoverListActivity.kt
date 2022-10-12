@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.project.curiosity.databinding.RoverListBinding
 import com.project.curiosity.room.Device
 import com.project.curiosity.viewModel.ViewModel
@@ -18,13 +19,14 @@ class RoverListActivity:AppCompatActivity() {
     private lateinit var deviceNameList: ArrayList<String>
     private lateinit var listAdapter: ArrayAdapter<String>
     private lateinit var idList:ListView
-    private val viewModel : ViewModel by viewModels()
+    private lateinit var viewModel : ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = RoverListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this)[ViewModel::class.java]
         val addDevice = binding.addDevice
         idList = binding.roverListview
 
