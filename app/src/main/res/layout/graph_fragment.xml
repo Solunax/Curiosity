@@ -1,18 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    tools:layout_editor_absoluteX="1dp"
+    tools:layout_editor_absoluteY="1dp">
 
-    <Button
-        android:id="@+id/g"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="graph"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="720dp"
+        tools:context=".MainActivity"
+        android:paddingBottom="24dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/mdtp_light_gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageButton
+            android:id="@+id/imageButton_temp"
+            android:layout_width="85dp"
+            android:layout_height="131dp"
+            android:layout_marginTop="76dp"
+            android:background="@color/white"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.199"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/temp_f" />
+
+        <ImageButton
+            android:id="@+id/imageButton_humi"
+            android:layout_width="71dp"
+            android:layout_height="121dp"
+            android:layout_marginTop="76dp"
+            android:background="@color/white"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.776"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/humidity_f" />
+
+        <TextView
+            android:id="@+id/textView_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text=""
+            android:textColor="@color/myyellow"
+            android:textSize="60dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/imageButton_temp"
+            app:layout_constraintHorizontal_bias="0.41"
+            app:layout_constraintStart_toStartOf="@+id/imageButton_temp"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton_temp" />
+
+        <TextView
+            android:id="@+id/textView_humi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text=""
+            android:textColor="@color/myblue"
+            android:textSize="60dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/imageButton_humi"
+            app:layout_constraintHorizontal_bias="0.492"
+            app:layout_constraintStart_toStartOf="@+id/imageButton_humi"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton_humi" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Humidity"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/textView_humi"
+            app:layout_constraintHorizontal_bias="0.475"
+            app:layout_constraintStart_toStartOf="@+id/textView_humi"
+            app:layout_constraintTop_toBottomOf="@+id/textView_humi" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Temperature"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.183"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_temp" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="382dp"
+            android:layout_height="164dp"
+            android:layout_margin="32dp"
+            android:layout_marginTop="28dp"
+            app:layout_constraintEnd_toEndOf="@+id/textView3"
+            app:layout_constraintHorizontal_bias="0.068"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        </com.github.mikephil.charting.charts.LineChart>
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="78dp"
+            android:text="Humidity"
+            android:textColor="@color/myblue"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart2"
+            app:layout_constraintHorizontal_bias="0.025"
+            app:layout_constraintStart_toStartOf="@+id/lineChart2"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart2" />
+
+        <TextView
+            android:id="@+id/humitext1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="78dp"
+            android:text=""
+            android:textColor="@color/myyellow"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="18dp"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart2"
+            app:layout_constraintHorizontal_bias="0.271"
+            app:layout_constraintStart_toStartOf="@+id/lineChart2"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart2" />
+
+        <ImageButton
+            android:id="@+id/imageButton6"
+            android:layout_width="41dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="78dp"
+            android:background="@color/white"
+            android:scaleType="centerCrop"
+            android:scaleX="-1"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart2"
+            app:layout_constraintHorizontal_bias="0.885"
+            app:layout_constraintStart_toStartOf="@+id/lineChart2"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart2"
+            app:srcCompat="?android:attr/actionModeWebSearchDrawable" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart2"
+            android:layout_width="382dp"
+            android:layout_height="164dp"
+            android:layout_margin="32dp"
+            android:layout_marginTop="96dp"
+            app:layout_constraintEnd_toEndOf="@+id/textView10"
+            app:layout_constraintHorizontal_bias="0.128"
+            app:layout_constraintStart_toStartOf="@+id/textView10"
+            app:layout_constraintTop_toBottomOf="@+id/textView10">
+
+        </com.github.mikephil.charting.charts.LineChart>
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="96dp"
+            android:text="Temperature"
+            android:textColor="@color/myblue"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart"
+            app:layout_constraintHorizontal_bias="0.042"
+            app:layout_constraintStart_toStartOf="@+id/lineChart"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart" />
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="96dp"
+            android:text=""
+            android:textColor="@color/myyellow"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="30dp"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart"
+            app:layout_constraintHorizontal_bias="0.365"
+            app:layout_constraintStart_toStartOf="@+id/lineChart"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart" />
+
+        <ImageButton
+            android:id="@+id/imageButton7"
+            android:layout_width="41dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="96dp"
+            android:background="@color/white"
+            android:scaleType="centerCrop"
+            android:scaleX="-1"
+            app:layout_constraintEnd_toEndOf="@+id/lineChart"
+            app:layout_constraintHorizontal_bias="0.891"
+            app:layout_constraintStart_toStartOf="@+id/lineChart"
+            app:layout_constraintTop_toBottomOf="@+id/lineChart"
+            app:srcCompat="?android:attr/actionModeWebSearchDrawable" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart3"
+            android:layout_width="382dp"
+            android:layout_height="164dp"
+            android:layout_margin="32dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="@+id/textView5"
+            app:layout_constraintHorizontal_bias="0.106"
+            app:layout_constraintStart_toStartOf="@+id/textView5"
+            app:layout_constraintTop_toBottomOf="@+id/textView5">
+
+        </com.github.mikephil.charting.charts.LineChart>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="224dp"
+            android:text="ºc"
+            android:textColor="@color/main_yellow"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.371"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="224dp"
+            android:text="%"
+            android:textColor="@color/myblue"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.858"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</ScrollView>

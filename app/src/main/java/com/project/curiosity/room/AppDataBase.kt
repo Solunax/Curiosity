@@ -20,9 +20,5 @@ abstract class AppDataBase : RoomDatabase(){
             }
             return instance
         }
-//        Instance 초기화 코드
-//        fun deleteInstance(){
-//            instance = null
-//        }
     }
 }

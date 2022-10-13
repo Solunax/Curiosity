@@ -3,6 +3,7 @@
     package="com.project.curiosity">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:usesCleartextTraffic="true"
@@ -15,7 +16,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAEk_2DybfYrE0yPo0FMzjLkqR04hZbutU"/>
+            android:value=""/>
 
         <activity android:name=".SplashActivity"
             android:exported="true">
@@ -25,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".RoverListActivity"/>
         <activity android:name=".AddDeviceActivity"/>
     </application>
 

@@ -1,26 +1,17 @@
 package com.project.curiosity
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.project.curiosity.databinding.AddDeviceBinding
-import com.project.curiosity.room.AppDataBase
 import com.project.curiosity.room.Device
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import com.project.curiosity.viewModel.ViewModel
 
-class AddDeviceActivity:Activity() {
+class AddDeviceActivity:AppCompatActivity() {
     private lateinit var binding : AddDeviceBinding
-    private lateinit var job:Job
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if(::job.isInitialized)
-            job.cancel()
-    }
+    private val viewModel : ViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,37 +20,21 @@ class AddDeviceActivity:Activity() {
 
         val deviceName = binding.deviceName
         val addButton = binding.addDevice
-        val deleteButton = binding.deleteDevice
 
-        val data = intent.getStringArrayListExtra("deviceList")
-        Log.d("DATA", data.toString())
+        val deviceNameList = intent.getStringArrayListExtra("deviceList")
+        Log.d("DATA", deviceNameList.toString())
 
         addButton.setOnClickListener {
+            // 이름란이 비어있나 확인
             if(deviceName.text.isNotBlank()){
-                val deviceDB = AppDataBase.getInstance(this)
-
-                job = CoroutineScope(Dispatchers.IO).launch {
-                    val device = Device(deviceName.text.toString())
-                    deviceDB!!.DeviceDAO().insertDeviceData(device)
+                // 이미 있는 이름인지 확인
+                if(!deviceNameList!!.contains(deviceName.text.toString())){
+                    viewModel.insertDeviceData(Device(deviceName.text.toString()))
+                    finish()
+                }else{
+                    Toast.makeText(applicationContext, "이미 등록된 이름입니다.", Toast.LENGTH_SHORT).show()
+                    deviceName.requestFocus()
                 }
-                setResult(RESULT_OK)
-                finish()
-            }else{
-                Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
-                deviceName.requestFocus()
-            }
-        }
-
-        deleteButton.setOnClickListener {
-            if(deviceName.text.isNotBlank()){
-                val deviceDB = AppDataBase.getInstance(this)
-
-                job = CoroutineScope(Dispatchers.IO).launch {
-                    val device = Device(deviceName.text.toString())
-                    deviceDB!!.DeviceDAO().deleteDeviceData(device)
-                }
-                setResult(RESULT_OK)
-                finish()
             }else{
                 Toast.makeText(applicationContext, "장비 이름을 입력하세요", Toast.LENGTH_SHORT).show()
                 deviceName.requestFocus()

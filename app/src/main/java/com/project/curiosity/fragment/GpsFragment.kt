@@ -1,7 +1,6 @@
 package com.project.curiosity.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,57 +11,81 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.project.curiosity.MainActivity
-import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.GpsFragmentBinding
-import com.project.curiosity.model.Request
-import kotlinx.coroutines.*
+import java.util.*
 
 class GpsFragment: Fragment(), OnMapReadyCallback {
-    private lateinit var binding: GpsFragmentBinding
-    private var job: Job? = null
+    private var binding: GpsFragmentBinding? = null
     private lateinit var roverMap:MapView
+    private lateinit var map: GoogleMap
+    private lateinit var changeMap: FloatingActionButton
+    private val locationArray = LinkedList<LatLng>()
+    // 다른 로버가 선택되었는지 확인하기 위한 변수 now
+    private var now = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GpsFragmentBinding.inflate(inflater, container, false)
 
-        val name = binding.deviceName
-        val search = binding.search
-        val time = binding.time
-        val result = binding.result
-        roverMap = binding.mapView
+        roverMap = binding!!.mapView
+        changeMap = binding!!.mapChange
+
+        changeMap.setOnClickListener {
+            // 위성지도, 일반지도 변경
+            if(map.mapType == 1){
+                map.mapType = GoogleMap.MAP_TYPE_HYBRID
+                roverMap.invalidate()
+            } else{
+                map.mapType = GoogleMap.MAP_TYPE_NORMAL
+                roverMap.invalidate()
+            }
+        }
 
         roverMap.onCreate(savedInstanceState)
         roverMap.getMapAsync(this)
 
-        search.setOnClickListener {
-            val id = (activity as MainActivity).getSpinnerData()
-            val wantTime = time.text.toString()
-            getData(id, wantTime)
+        // MainActivity 의 ViewModel 공유해서 사용
+        (activity as MainActivity).viewModel.roverData.observe(viewLifecycleOwner){
+            // map 이 late init 이기에 초기화 후에 접근해야 함
+            if(::map.isInitialized){
+                if(it.deviceID != now) {
+                    now = it.deviceID
+                    map.clear()
+                    locationArray.clear()
+                }
+                addMarker(it.latitude, it.longitude)
+            }
         }
 
-        return binding.root
+        return binding!!.root
+    }
+
+    private fun addMarker(latitude : Double, longitude : Double) {
+        val location = LatLng(latitude, longitude)
+        locationArray.add(location)
+
+        if(locationArray.size == 1){
+            val marker = MarkerOptions()
+            marker.position(location)
+            map.addMarker(marker)
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+        }else if(locationArray.size > 1 && locationArray[locationArray.size - 1] != locationArray[locationArray.size - 2]){
+            val marker = MarkerOptions()
+            marker.position(location)
+            map.addMarker(marker)
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+            map.addPolyline(PolylineOptions().add(locationArray[locationArray.size - 2], locationArray[locationArray.size - 1]).width(15f))
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val location = LatLng(37.419780, 127.204483)
-        val markers = MarkerOptions()
-        markers.position(location)
-        googleMap.addMarker(markers)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13f))
-    }
-
-    private fun getData(nameValue: String, timeValue:String) {
-        job = CoroutineScope(Dispatchers.IO).launch {
-            val request = Request(nameValue, timeValue)
-            val response = ApiClient.getApiClient().getData(request)
-            if(response.isSuccessful && response.body()!!.statusCode ==200)
-                requireActivity().runOnUiThread{ binding.result.text = response.body().toString() }
-        }
+        map = googleMap
     }
 
     override fun onStart() {
@@ -87,6 +110,8 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
 
     override fun onDestroy() {
         roverMap.onDestroy()
+        locationArray.clear()
+        binding = null
         super.onDestroy()
     }
 }

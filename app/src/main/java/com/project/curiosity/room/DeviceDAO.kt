@@ -2,6 +2,7 @@ package com.project.curiosity.room
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.IGNORE
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DeviceDAO {
@@ -9,7 +10,7 @@ interface DeviceDAO {
     suspend fun insertDeviceData(device: Device)
 
     @Query("SELECT * FROM device")
-    suspend fun getDeviceData():List<Device>
+    fun getDeviceData(): Flow<List<Device>>
 
     @Delete
     suspend fun deleteDeviceData(device: Device)

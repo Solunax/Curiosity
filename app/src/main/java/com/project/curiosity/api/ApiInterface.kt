@@ -1,6 +1,8 @@
 package com.project.curiosity.api
 
 import com.project.curiosity.model.Data
+import com.project.curiosity.model.LedBody
+import com.project.curiosity.model.LedRequest
 import com.project.curiosity.model.Request
 import retrofit2.Response
 import retrofit2.http.Body
@@ -11,4 +13,7 @@ import retrofit2.http.POST
 interface ApiInterface {
     @POST("GET_From_DB")
     suspend fun getData(@Body body:Request):Response<Data>
+
+    @POST("led_control")
+    suspend fun changeLedState(@Body body:LedRequest):Response<LedBody>
 }
