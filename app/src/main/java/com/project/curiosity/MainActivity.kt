@@ -15,22 +15,32 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.Spinner
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.MainActivityBinding
+import com.project.curiosity.fragment.GraphFragment
 import com.project.curiosity.fragmentAdapter.StateAdapter
+import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
 import com.project.curiosity.viewModel.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.Exception
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(){
     private lateinit var binding : MainActivityBinding
+    private lateinit var job:Job
     private val deviceNameList = ArrayList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp2, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
+    private var recentBody:Body? = null
     val viewModel : ViewModel by viewModels()
 
     @SuppressLint("InflateParams")
@@ -132,12 +142,6 @@ class MainActivity : AppCompatActivity(){
             viewModel.getData(Request(nameData, ""), "latest")
     }
 
-    fun getDataCalendar(timestamp:String){
-        val nameData = getSpinnerData()
-        if(nameData != "ERROR")
-            viewModel.getData(Request(nameData, timestamp), "specific")
-    }
-
     // TabLayout 아이콘 색상 변경 함수
     private fun setColors(view : View?, flag : Boolean){
         val icon: ImageView? = view?.findViewById(R.id.tab_icon)
@@ -154,6 +158,37 @@ class MainActivity : AppCompatActivity(){
                     icon?.colorFilter = BlendModeColorFilter(Color.parseColor("#343434"), BlendMode.SRC_IN)
                 else
                     icon?.setColorFilter(Color.parseColor("#343434"), PorterDuff.Mode.SRC_IN)
+            }
+        }
+    }
+
+//    기존 통신 코드
+//    private fun getData() {
+//        job = CoroutineScope(Dispatchers.IO).launch {
+//            val request = Request(getSpinnerData(), "")
+//            val response = ApiClient.getApiClient().getData(request)
+//            if(response.isSuccessful && response.body()!!.statusCode == 200){
+//                recentBody = response.body()!!.body[0]
+//                if(fragmentIndex == 1){
+//                    val graphFragment = supportFragmentManager.findFragmentByTag("f1") as GraphFragment
+//                    graphFragment.setGraph(recentBody!!)
+//                }else if(fragmentIndex == 2){
+//                    val gpsFragment = supportFragmentManager.findFragmentByTag("f2") as GpsFragment
+//                    gpsFragment.drawRoute(false, recentBody!!)
+//                }
+//            }
+//        }
+//    }
+
+    // 장치 변경시 그래프 갱신,, 변경 필요
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun changeDevice(fragment:GraphFragment) {
+        job = CoroutineScope(Dispatchers.IO).launch {
+            val request = Request(getSpinnerData(), "")
+            val response = ApiClient.getApiClient().getData(request)
+            if(response.isSuccessful && response.body()!!.statusCode == 200){
+                recentBody = response.body()!!.body[0]
+                fragment.setGraph2(recentBody!!)
             }
         }
     }

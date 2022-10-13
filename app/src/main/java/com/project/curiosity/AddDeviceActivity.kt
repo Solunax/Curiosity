@@ -5,21 +5,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.project.curiosity.databinding.AddDeviceBinding
 import com.project.curiosity.room.Device
 import com.project.curiosity.viewModel.ViewModel
 
 class AddDeviceActivity:AppCompatActivity() {
     private lateinit var binding : AddDeviceBinding
-    private lateinit var viewModel : ViewModel
+    private val viewModel : ViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = AddDeviceBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[ViewModel::class.java]
         val deviceName = binding.deviceName
         val addButton = binding.addDevice
 

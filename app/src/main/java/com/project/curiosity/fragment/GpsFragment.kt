@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -14,8 +13,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.project.curiosity.MainActivity
 import com.project.curiosity.databinding.GpsFragmentBinding
-import com.project.curiosity.viewModel.ViewModel
 import java.util.*
 
 class GpsFragment: Fragment(), OnMapReadyCallback {
@@ -24,7 +23,6 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var changeMap: FloatingActionButton
     private val locationArray = LinkedList<LatLng>()
-    private lateinit var viewModel : ViewModel
     // 다른 로버가 선택되었는지 확인하기 위한 변수 now
     private var now = ""
 
@@ -52,10 +50,8 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
         roverMap.onCreate(savedInstanceState)
         roverMap.getMapAsync(this)
 
-        // ViewModel
-        viewModel = ViewModelProvider(requireActivity())[ViewModel::class.java]
-
-        viewModel.roverData.observe(viewLifecycleOwner){
+        // MainActivity 의 ViewModel 공유해서 사용
+        (activity as MainActivity).viewModel.roverData.observe(viewLifecycleOwner){
             // map 이 late init 이기에 초기화 후에 접근해야 함
             if(::map.isInitialized){
                 if(it.deviceID != now) {
