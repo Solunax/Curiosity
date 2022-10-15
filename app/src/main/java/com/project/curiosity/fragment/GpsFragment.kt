@@ -1,7 +1,6 @@
 package com.project.curiosity.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,7 +58,6 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
             // map 이 late init 이기에 초기화 후에 접근해야 함
             if(::map.isInitialized){
                 if(it.deviceID != now) {
-                    Log.d("DEB", "CHANGED")
                     now = it.deviceID
                     map.clear()
                     locationArray.clear()
