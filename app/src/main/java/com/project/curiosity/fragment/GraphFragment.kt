@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
@@ -24,6 +24,7 @@ import com.project.curiosity.MainActivity
 import com.project.curiosity.R
 import com.project.curiosity.databinding.GraphFragmentBinding
 import com.project.curiosity.model.Body
+import com.project.curiosity.viewModel.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,6 +39,7 @@ class GraphFragment : Fragment() {
     private var job: Job? = null
     private val calendar = Calendar.getInstance()
     private lateinit var dateSetListener : DatePickerDialog.OnDateSetListener
+    private lateinit var viewModel : ViewModel
 
     private var now = ""
     private var sensorList = ArrayList<sensor>()
@@ -60,6 +62,8 @@ class GraphFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        viewModel = ViewModelProvider(requireActivity())[ViewModel::class.java]
 
         binding = GraphFragmentBinding.inflate(inflater, container, false)
         val temperatureText = binding.temp
@@ -111,39 +115,37 @@ class GraphFragment : Fragment() {
             getDate(it)
         }
 
-        (activity as MainActivity).viewModel.roverData.observe(viewLifecycleOwner) {
+        viewModel.roverData.observe(viewLifecycleOwner) {
             if(it.deviceID != now) {
                 now = it.deviceID
                 setGraph2(it)
-            }
-            setGraph(it)
+            }else
+                setGraph(it)
         }
 
-        (activity as MainActivity).viewModel.specificData.observe(viewLifecycleOwner) {
-            if(it[0].deviceID != now) {
-                now = it[0].deviceID
-                setGraph2(it[0])
-            }else {
-                val type = "True"
-                val datasize = it.size
-                getSpecificData(it, datasize, type)
-            }
+        viewModel.specificData.observe(viewLifecycleOwner) {
+            val type = "True"
+            val datasize = it.size
+            getSpecificData(it, datasize, type)
+
+
         }
 
-        (activity as MainActivity).viewModel.specificErrorData.observe(viewLifecycleOwner) {
+        viewModel.specificErrorData.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let{
-                Log.d("처리중" , "데이터 변함!")
+                if(calendarState == 1) {
+                    sensorList2.clear()
+                    getSensorList2()
+                    setDataToLineChartRenewTemperature()}
+                else if(calendarState == 2){
+                    sensorList3.clear()
+                    getSensorList3()
+                    setDataToLineChartRenewHumidity1()}
                 requireActivity().runOnUiThread { Toast.makeText(context, "선택한 날짜의 정보가 없습니다.", Toast.LENGTH_SHORT).show() }
             }
         }
 
-        initLineChart()
-        setDataToLineChartHumidity()
-        setDataToLineChart()
-        initLineChart2()
-        setDataToLineChart2()
-        initLineChart3()
-        setDataToLineChart3()
+        initChart()
 
         return binding.root
     }
@@ -193,8 +195,6 @@ class GraphFragment : Fragment() {
 
 
     }
-
-
 
     private fun initLineChart2() {
 
@@ -256,13 +256,13 @@ class GraphFragment : Fragment() {
         xAxis.setDrawAxisLine(true)
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.valueFormatter = MyAxisFormatter3()
+
         xAxis.setDrawLabels(true)
         xAxis.granularity = 1f
+
         xAxis.axisLineColor
 
     }
-
-
 
     //temp, humi
     inner class MyAxisFormatter : IndexAxisValueFormatter() {
@@ -547,6 +547,10 @@ class GraphFragment : Fragment() {
                 val count = length
                 sensorList2.clear()
                 sensorList3.clear()
+                if(count <= 1 && calendarState == 1)
+                    sensorList2.add(sensor("", 0))
+                else if (count <= 1 && calendarState == 2)
+                    sensorList3.add(sensor1("", 0))
                 while (i < count) {
                     var a = data[i].timestamp
                     val b = data[i].temperature
@@ -623,6 +627,7 @@ class GraphFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun setGraph2(data:Body) {
         try {
+            globalCount = 0
             sensorList.clear()
             sensorList1.clear()
             sensorList2.clear()
@@ -651,11 +656,20 @@ class GraphFragment : Fragment() {
                     setDataToLineChartRenew()
                 else
                     setDataToLineChartRenewHumidity()
-
             }
         }catch (e: Exception){
             //
         }
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun initChart() {
+        initLineChart()
+        setDataToLineChartHumidity()
+        setDataToLineChart()
+        initLineChart2()
+        setDataToLineChart2()
+        initLineChart3()
+        setDataToLineChart3()
     }
 }
