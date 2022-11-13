@@ -22,16 +22,18 @@ import com.project.curiosity.databinding.MainActivityBinding
 import com.project.curiosity.fragmentAdapter.StateAdapter
 import com.project.curiosity.model.Request
 import com.project.curiosity.viewModel.ViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.Exception
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private lateinit var binding : MainActivityBinding
     private val deviceNameList = ArrayList<String>()
     private val tabIcon = arrayOf(R.drawable.cam, R.drawable.temp2, R.drawable.gps)
     private lateinit var deviceSpinner:Spinner
-    val viewModel : ViewModel by viewModels()
+    private val viewModel : ViewModel by viewModels()
 
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {

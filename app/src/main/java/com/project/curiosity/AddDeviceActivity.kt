@@ -8,7 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.project.curiosity.databinding.AddDeviceBinding
 import com.project.curiosity.room.Device
 import com.project.curiosity.viewModel.ViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddDeviceActivity:AppCompatActivity() {
     private lateinit var binding : AddDeviceBinding
     private val viewModel : ViewModel by viewModels()

@@ -628,6 +628,7 @@ class GraphFragment : Fragment() {
     fun setGraph2(data:Body) {
         try {
             globalCount = 0
+            state = 0
             sensorList.clear()
             sensorList1.clear()
             sensorList2.clear()

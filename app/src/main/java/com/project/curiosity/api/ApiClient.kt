@@ -2,18 +2,27 @@ package com.project.curiosity.api
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
-object ApiClient {
+@Module
+@InstallIn(SingletonComponent::class)
+class ApiClient {
     private val BASE_URL:String = "https://csj9ubr0p5.execute-api.ap-northeast-2.amazonaws.com/default/"
 
-    private fun getRetrofit(): Retrofit {
+    @Singleton
+    @Provides
+    fun provideRetrofit(): Retrofit {
         val gson: Gson = GsonBuilder().setLenient().create()
-        val httpLoggingInterceptor: HttpLoggingInterceptor = HttpLoggingInterceptor()
+        val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
 
@@ -24,7 +33,9 @@ object ApiClient {
             .build()
     }
 
-    fun getApiClient():ApiInterface{
-        return getRetrofit().create(ApiInterface::class.java)
+    @Singleton
+    @Provides
+    fun provideApiInterface():ApiInterface{
+        return provideRetrofit().create(ApiInterface::class.java)
     }
 }
