@@ -11,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.project.curiosity.databinding.RoverListBinding
 import com.project.curiosity.room.Device
 import com.project.curiosity.viewModel.ViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class RoverListActivity:AppCompatActivity() {
     private lateinit var binding: RoverListBinding
     private lateinit var deviceNameList: ArrayList<String>

@@ -1,20 +1,19 @@
 package com.project.curiosity.viewModel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.*
 import com.project.curiosity.Event
-import com.project.curiosity.api.ApiClient
 import com.project.curiosity.model.Body
 import com.project.curiosity.model.Request
 import com.project.curiosity.repository.Repository
-import com.project.curiosity.room.AppDataBase
 import com.project.curiosity.room.Device
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ViewModel(application : Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ViewModel @Inject constructor(private val repository : Repository) : androidx.lifecycle.ViewModel() {
     val nameData : LiveData<List<Device>>
     private val _roverData = MutableLiveData<Body>()
     val roverData get() = _roverData
@@ -22,10 +21,8 @@ class ViewModel(application : Application) : AndroidViewModel(application) {
     val specificData get() = _specificData
     private val _specificErrorData = MutableLiveData<Event<Boolean>>()
     val specificErrorData get() = _specificErrorData
-    private val repository : Repository
 
     init{
-        repository = Repository(ApiClient.getApiClient(), AppDataBase.getInstance(application))
         nameData = repository.nameData.asLiveData()
     }
 

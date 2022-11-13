@@ -18,6 +18,7 @@ import com.project.curiosity.R
 import com.project.curiosity.api.ApiClient
 import com.project.curiosity.databinding.CameraFragmentBinding
 import com.project.curiosity.model.LedRequest
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,15 +27,15 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 
-
+@AndroidEntryPoint
 class CameraFragment : Fragment() {
+    private val api = ApiClient().provideApiInterface()
     private lateinit var binding : CameraFragmentBinding
     private lateinit var job: Job
     private var ledState = false
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,7 +60,7 @@ class CameraFragment : Fragment() {
         flashButton.setOnClickListener{
             job = CoroutineScope(Dispatchers.IO).launch {
                 val request = LedRequest(if(!ledState) "1" else "0")
-                val response = ApiClient.getApiClient().changeLedState(request)
+                val response = api.changeLedState(request)
                 if(response.body()!!.statusCode == 200){
                     ledState = !ledState
                     changeIcon(ledState, flashButton)
@@ -119,7 +120,7 @@ class CameraFragment : Fragment() {
                         }, Handler(Looper.getMainLooper())
                     )
                 }
-            }catch (e:Exception){
+            }catch (_:Exception){
             }
         }
     }
