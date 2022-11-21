@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
@@ -39,7 +40,7 @@ class GraphFragment : Fragment() {
     private var job: Job? = null
     private val calendar = Calendar.getInstance()
     private lateinit var dateSetListener : DatePickerDialog.OnDateSetListener
-    private lateinit var viewModel : ViewModel
+    private val viewModel by activityViewModels<ViewModel>()
 
     private var now = ""
     private var sensorList = ArrayList<sensor>()
@@ -55,16 +56,12 @@ class GraphFragment : Fragment() {
     var state = 0
     var dateString = ""
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        viewModel = ViewModelProvider(requireActivity())[ViewModel::class.java]
-
         binding = GraphFragmentBinding.inflate(inflater, container, false)
         val temperatureText = binding.temp
         val humidityText = binding.humitext1

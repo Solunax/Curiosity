@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -24,7 +25,7 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var changeMap: FloatingActionButton
     private val locationArray = LinkedList<LatLng>()
-    private lateinit var viewModel : ViewModel
+    private val viewModel by activityViewModels<ViewModel>()
     // 다른 로버가 선택되었는지 확인하기 위한 변수 now
     private var now = ""
 
@@ -35,7 +36,6 @@ class GpsFragment: Fragment(), OnMapReadyCallback {
     ): View {
         binding = GpsFragmentBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProvider(requireActivity())[ViewModel::class.java]
         roverMap = binding!!.mapView
         changeMap = binding!!.mapChange
 
